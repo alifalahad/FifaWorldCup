@@ -63,8 +63,7 @@ return new class extends Migration
             // ── Foreign key constraint ────────────────────────────────────
             $table->foreign('role_id')
                   ->references('role_id')
-                  ->on('roles')
-                  ->restrictOnDelete();  // prevent deleting a role that has users
+                  ->on('roles');  // prevent deleting a role that has users
         });
 
         // ── password_reset_tokens (default Laravel table, keep as-is) ─────

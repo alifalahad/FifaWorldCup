@@ -57,8 +57,7 @@ return new class extends Migration
 
             $table->foreign('stadium_id')
                   ->references('stadium_id')
-                  ->on('stadiums')
-                  ->restrictOnDelete();
+                  ->on('stadiums');
 
             $table->foreign('referee_id')
                   ->references('referee_id')
@@ -67,13 +66,11 @@ return new class extends Migration
 
             $table->foreign('home_team_id')
                   ->references('team_id')
-                  ->on('teams')
-                  ->restrictOnDelete();
+                  ->on('teams');
 
             $table->foreign('away_team_id')
                   ->references('team_id')
-                  ->on('teams')
-                  ->restrictOnDelete();
+                  ->on('teams');
 
             $table->foreign('group_id')
                   ->references('group_id')

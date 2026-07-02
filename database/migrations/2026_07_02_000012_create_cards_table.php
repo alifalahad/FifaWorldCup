@@ -41,13 +41,11 @@ return new class extends Migration
 
             $table->foreign('player_id')
                   ->references('player_id')
-                  ->on('players')
-                  ->restrictOnDelete();
+                  ->on('players');
 
             $table->foreign('team_id')
                   ->references('team_id')
-                  ->on('teams')
-                  ->restrictOnDelete();
+                  ->on('teams');
         });
 
         // CHECK: card_type values

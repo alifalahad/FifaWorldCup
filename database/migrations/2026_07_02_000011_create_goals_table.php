@@ -43,8 +43,7 @@ return new class extends Migration
 
             $table->foreign('scorer_player_id')
                   ->references('player_id')
-                  ->on('players')
-                  ->restrictOnDelete();
+                  ->on('players');
 
             $table->foreign('assist_player_id')
                   ->references('player_id')
@@ -53,8 +52,7 @@ return new class extends Migration
 
             $table->foreign('team_id')
                   ->references('team_id')
-                  ->on('teams')
-                  ->restrictOnDelete();
+                  ->on('teams');
         });
 
         // CHECK: goal_type values

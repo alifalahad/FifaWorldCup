@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -12,14 +11,17 @@ class DatabaseSeeder extends Seeder
 
     /**
      * Seed the application's database.
+     *
+     * Run order matters:
+     *   1. RoleSeeder       — creates ADMIN/VIEWER roles (needed before users)
+     *   2. SampleDataSeeder — tournaments, teams, stadiums, referees, coaches,
+     *                         groups, team registrations, matches, test users
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-
-        User::factory()->create([
-            'name' => 'Test User',
-            'email' => 'test@example.com',
+        $this->call([
+            RoleSeeder::class,
+            SampleDataSeeder::class,
         ]);
     }
 }
