@@ -33,7 +33,8 @@ class EnsureUserHasRole
 
         // Check active status
         if ($user->is_active !== 'Y') {
-            abort(403, 'Your account has been deactivated.');
+            return redirect()->route('home')
+                ->with('error', 'Your account has been deactivated. Please contact an administrator.');
         }
 
         // Load the role relationship if not already loaded
@@ -41,7 +42,8 @@ class EnsureUserHasRole
 
         // Check if the user's role name matches any of the allowed roles
         if (! $user->role || ! in_array($user->role->role_name, $roles, true)) {
-            abort(403, 'You do not have permission to access this page.');
+            return redirect()->route('home')
+                ->with('error', 'You do not have permission to access that page. Admin access is required.');
         }
 
         return $next($request);

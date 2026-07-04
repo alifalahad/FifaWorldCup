@@ -4,6 +4,25 @@
 @section('meta_description', 'Welcome to the FIFA World Cup Management System. Browse tournaments, teams, players, fixtures and standings.')
 
 @section('content')
+
+{{-- Flash messages (e.g. "not authorized" redirect from role middleware) --}}
+@if(session('error'))
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <div class="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
+        <span class="text-lg">🚫</span>
+        <span>{{ session('error') }}</span>
+    </div>
+</div>
+@endif
+@if(session('success'))
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
+    <div class="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800 text-sm">
+        <span class="text-lg">✅</span>
+        <span>{{ session('success') }}</span>
+    </div>
+</div>
+@endif
+
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
     {{-- Hero --}}
