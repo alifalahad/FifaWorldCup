@@ -1,0 +1,88 @@
+@extends('layouts.admin')
+
+@section('title', 'Teams')
+@section('page-title', 'Teams')
+@section('breadcrumb', 'Admin › Teams')
+
+@section('content')
+
+@if(session('success'))
+<div class="mb-4 p-3 bg-green-50 border border-green-200 text-green-800 rounded-md text-sm flex items-center gap-2">
+    ✅ {{ session('success') }}
+</div>
+@endif
+
+<div class="flex items-center justify-between mb-6">
+    <p class="text-sm text-gray-500">{{ $teams->total() }} team(s) found</p>
+    <a href="{{ route('admin.teams.create') }}"
+       class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-md transition">
+        + New Team
+    </a>
+</div>
+
+{{-- Search + filter --}}
+<form method="GET" action="{{ route('admin.teams.index') }}" class="flex gap-3 mb-6">
+    <input type="text" name="search" value="{{ request('search') }}"
+           placeholder="Search by name or abbreviation…"
+           class="flex-1 border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+    <select name="continent" class="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
+        <option value="">All confederations</option>
+        @foreach($continents as $c)
+        <option value="{{ $c }}" {{ request('continent') === $c ? 'selected' : '' }}>{{ $c }}</option>
+        @endforeach
+    </select>
+    <button type="submit" class="bg-gray-800 hover:bg-gray-700 text-white text-sm px-4 py-2 rounded-md transition">Filter</button>
+    @if(request('search') || request('continent'))
+    <a href="{{ route('admin.teams.index') }}" class="text-sm text-gray-500 hover:text-gray-700 flex items-center">Clear</a>
+    @endif
+</form>
+
+<div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+    @if($teams->isEmpty())
+    <div class="py-16 text-center text-gray-400 text-sm">
+        No teams found. <a href="{{ route('admin.teams.create') }}" class="text-indigo-600 hover:underline">Add one →</a>
+    </div>
+    @else
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider border-b border-gray-100">
+                <th class="px-6 py-3 text-left">Country</th>
+                <th class="px-6 py-3 text-left">Abbr.</th>
+                <th class="px-6 py-3 text-left">Confederation</th>
+                <th class="px-6 py-3 text-center">FIFA Rank</th>
+                <th class="px-6 py-3 text-center">Actions</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-100">
+            @foreach($teams as $team)
+            <tr class="hover:bg-gray-50 transition">
+                <td class="px-6 py-3 font-medium text-gray-800">{{ $team->country_name }}</td>
+                <td class="px-6 py-3 font-mono text-gray-600 font-bold">{{ $team->abbreviation }}</td>
+                <td class="px-6 py-3">
+                    <span class="inline-block px-2 py-0.5 rounded-full text-xs font-medium bg-blue-50 text-blue-700">
+                        {{ $team->continent }}
+                    </span>
+                </td>
+                <td class="px-6 py-3 text-center text-gray-600">{{ $team->fifa_ranking ?? '—' }}</td>
+                <td class="px-6 py-3 text-center">
+                    <div class="flex items-center justify-center gap-3">
+                        <a href="{{ route('admin.teams.edit', $team->team_id) }}"
+                           class="text-gray-500 hover:text-indigo-600 text-xs font-medium">Edit</a>
+                        <form method="POST" action="{{ route('admin.teams.destroy', $team->team_id) }}"
+                              onsubmit="return confirm('Delete {{ addslashes($team->country_name) }}?')">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="text-red-500 hover:text-red-700 text-xs font-medium">Delete</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+            @endforeach
+        </tbody>
+    </table>
+    @if($teams->hasPages())
+    <div class="px-6 py-4 border-t border-gray-100">{{ $teams->links() }}</div>
+    @endif
+    @endif
+</div>
+
+@endsection

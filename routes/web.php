@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\TournamentController;
+use App\Http\Controllers\Admin\TeamController;
+use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\ProfileController;
 use App\Models\GroupStanding;
 use App\Models\TournamentGroup;
@@ -43,14 +46,32 @@ Route::prefix('admin')
 
         // Stub sections — replaced by real controllers in Prompts 12-17
         $comingSoon = fn (string $section) => response()->view('admin.coming-soon', ['section' => $section]);
-        Route::get('/tournaments',        fn () => $comingSoon('Tournaments'))->name('tournaments.index');
-        Route::get('/tournaments/create', fn () => $comingSoon('Tournaments'))->name('tournaments.create');
-        Route::get('/teams',              fn () => $comingSoon('Teams'))->name('teams.index');
-        Route::get('/teams/create',       fn () => $comingSoon('Teams'))->name('teams.create');
+
+        // Prompt 12: Tournaments (real CRUD)
+        Route::resource('tournaments', TournamentController::class)
+            ->parameters(['tournaments' => 'tournament:tournament_id']);
+
+        // Register Team nested routes on Tournament
+        Route::get('/tournaments/{tournament:tournament_id}/register-team',
+            [TournamentController::class, 'registerTeam'])
+            ->name('tournaments.register-team');
+        Route::post('/tournaments/{tournament:tournament_id}/register-team',
+            [TournamentController::class, 'storeRegisteredTeam'])
+            ->name('tournaments.register-team.store');
+
+        // Prompt 13: Teams (real CRUD)
+        Route::resource('teams', TeamController::class)
+            ->parameters(['teams' => 'team:team_id'])
+            ->except(['show']);
+
+        // Prompt 13: Coaches (real CRUD)
+        Route::resource('coaches', CoachController::class)
+            ->parameters(['coaches' => 'coach:coach_id'])
+            ->except(['show']);
+
+        // Stubs for Prompts 14-17 (Players, Stadiums, Referees, Matches)
         Route::get('/players',            fn () => $comingSoon('Players'))->name('players.index');
         Route::get('/players/create',     fn () => $comingSoon('Players'))->name('players.create');
-        Route::get('/coaches',            fn () => $comingSoon('Coaches'))->name('coaches.index');
-        Route::get('/coaches/create',     fn () => $comingSoon('Coaches'))->name('coaches.create');
         Route::get('/stadiums',           fn () => $comingSoon('Stadiums'))->name('stadiums.index');
         Route::get('/stadiums/create',    fn () => $comingSoon('Stadiums'))->name('stadiums.create');
         Route::get('/referees',           fn () => $comingSoon('Referees'))->name('referees.index');
