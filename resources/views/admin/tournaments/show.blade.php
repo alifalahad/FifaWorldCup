@@ -120,6 +120,7 @@
                     <th class="px-6 py-3 text-left">Coach</th>
                     <th class="px-6 py-3 text-left">Seed</th>
                     <th class="px-6 py-3 text-left">Stage</th>
+                    <th class="px-6 py-3 text-center">Roster</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-gray-100">
@@ -142,6 +143,12 @@
                     </td>
                     <td class="px-6 py-3 text-gray-600 text-xs">
                         {{ $tt->elimination_stage ?? 'Active' }}
+                    </td>
+                    <td class="px-6 py-3 text-center">
+                        <a href="{{ route('admin.roster.index', $tt->team_tournament_id) }}"
+                           class="inline-block text-xs font-medium text-indigo-600 hover:text-indigo-800 bg-indigo-50 hover:bg-indigo-100 px-2 py-1 rounded transition">
+                            Manage Roster
+                        </a>
                     </td>
                 </tr>
                 @endforeach

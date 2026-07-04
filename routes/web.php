@@ -4,6 +4,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\TournamentController;
 use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\CoachController;
+use App\Http\Controllers\Admin\PlayerController;
+use App\Http\Controllers\Admin\RosterController;
 use App\Http\Controllers\ProfileController;
 use App\Models\GroupStanding;
 use App\Models\TournamentGroup;
@@ -69,9 +71,20 @@ Route::prefix('admin')
             ->parameters(['coaches' => 'coach:coach_id'])
             ->except(['show']);
 
-        // Stubs for Prompts 14-17 (Players, Stadiums, Referees, Matches)
-        Route::get('/players',            fn () => $comingSoon('Players'))->name('players.index');
-        Route::get('/players/create',     fn () => $comingSoon('Players'))->name('players.create');
+        // Prompt 14: Players (real CRUD)
+        Route::resource('players', PlayerController::class)
+            ->parameters(['players' => 'player:player_id'])
+            ->except(['show']);
+
+        // Prompt 14: Roster management (team-tournament squad)
+        Route::get('/team-tournament/{teamTournament}/roster',
+            [RosterController::class, 'index'])->name('roster.index');
+        Route::post('/team-tournament/{teamTournament}/roster',
+            [RosterController::class, 'store'])->name('roster.store');
+        Route::delete('/team-tournament/{teamTournament}/roster/{playerTournament}',
+            [RosterController::class, 'destroy'])->name('roster.destroy');
+
+        // Stubs for Prompts 15-17 (Stadiums, Referees, Matches)
         Route::get('/stadiums',           fn () => $comingSoon('Stadiums'))->name('stadiums.index');
         Route::get('/stadiums/create',    fn () => $comingSoon('Stadiums'))->name('stadiums.create');
         Route::get('/referees',           fn () => $comingSoon('Referees'))->name('referees.index');
