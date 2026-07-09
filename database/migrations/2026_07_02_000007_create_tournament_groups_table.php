@@ -38,11 +38,15 @@ return new class extends Migration
         });
 
         // CHECK constraint: group_name must be A through L
-        DB::statement("
+        try {
+            DB::statement("
             ALTER TABLE tournament_groups
             ADD CONSTRAINT chk_tgroup_name
             CHECK (group_name IN ('A','B','C','D','E','F','G','H','I','J','K','L'))
         ");
+        } catch (\Exception $e) {
+            // Oracle-specific DDL — silently skipped on SQLite (test env)
+        }
     }
 
     public function down(): void

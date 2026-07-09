@@ -134,7 +134,7 @@ class TournamentController extends Controller
     public function storeRegisteredTeam(Request $request, Tournament $tournament)
     {
         $validated = $request->validate([
-            'team_id'      => [
+            'team_id'           => [
                 'required',
                 'integer',
                 'exists:teams,team_id',
@@ -142,11 +142,25 @@ class TournamentController extends Controller
                 Rule::unique('team_tournament', 'team_id')
                     ->where('tournament_id', $tournament->tournament_id),
             ],
-            'group_id'     => ['nullable', 'integer', 'exists:tournament_groups,group_id'],
-            'coach_id'     => ['nullable', 'integer', 'exists:coaches,coach_id'],
-            'seed_position'=> ['nullable', 'integer', 'min:1', 'max:99'],
+            'group_id'          => [
+                'nullable', 'integer',
+                // Ensure group belongs to THIS tournament
+                Rule::exists('tournament_groups', 'group_id')
+                    ->where('tournament_id', $tournament->tournament_id),
+            ],
+            'coach_id'          => ['nullable', 'integer', 'exists:coaches,coach_id'],
+            'seed_position'     => ['nullable', 'integer', 'min:1', 'max:48'],
+            'elimination_stage' => [
+                'nullable',
+                Rule::in([
+                    'GROUP', 'ROUND_OF_16', 'QUARTER_FINAL',
+                    'SEMI_FINAL', 'THIRD_PLACE', 'FINAL', 'CHAMPION',
+                ]),
+            ],
         ], [
-            'team_id.unique' => 'That team is already registered for this tournament.',
+            'team_id.unique'          => 'That team is already registered for this tournament.',
+            'group_id.exists'         => 'The selected group does not belong to this tournament.',
+            'elimination_stage.in'    => 'Invalid elimination stage value.',
         ]);
 
         $validated['tournament_id'] = $tournament->tournament_id;

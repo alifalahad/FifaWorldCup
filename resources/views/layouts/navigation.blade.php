@@ -1,45 +1,71 @@
-<nav x-data="{ open: false }" class="bg-white border-b border-gray-100">
+<nav x-data="{ open: false, searching: false }" class="bg-white border-b border-gray-100 shadow-sm">
     <!-- Primary Navigation Menu -->
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-            <div class="flex">
-                <!-- Logo -->
-                <div class="shrink-0 flex items-center">
-                    <a href="{{ route('home') }}">
-                        <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
-                    </a>
-                </div>
+        <div class="flex justify-between h-16 items-center">
 
-                <!-- Navigation Links (desktop) -->
-                <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
-                    <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
-                        {{ __('Home') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('tournaments.index')" :active="request()->routeIs('tournaments.*')">
-                        {{ __('Tournaments') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('teams.index')" :active="request()->routeIs('teams.*')">
-                        {{ __('Teams') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('players.index')" :active="request()->routeIs('players.*')">
-                        {{ __('Players') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('fixtures.index')" :active="request()->routeIs('fixtures.*')">
-                        {{ __('Fixtures') }}
-                    </x-nav-link>
-                    <x-nav-link :href="route('standings.index')" :active="request()->routeIs('standings.*')">
-                        {{ __('Standings') }}
-                    </x-nav-link>
-                    @auth
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-                    @endauth
-                </div>
+            <!-- Logo -->
+            <div class="shrink-0 flex items-center">
+                <a href="{{ route('home') }}">
+                    <x-application-logo class="block h-9 w-auto fill-current text-gray-800" />
+                </a>
             </div>
 
-            <!-- Right side: user dropdown (auth) or Login + Register (guest) -->
-            <div class="hidden sm:flex sm:items-center sm:ms-6">
+            <!-- Navigation Links (desktop) -->
+            <div class="hidden space-x-6 sm:flex items-center flex-1 mx-6">
+                <x-nav-link :href="route('home')" :active="request()->routeIs('home')">
+                    {{ __('Home') }}
+                </x-nav-link>
+                <x-nav-link :href="route('tournaments.index')" :active="request()->routeIs('tournaments.*')">
+                    {{ __('Tournaments') }}
+                </x-nav-link>
+                <x-nav-link :href="route('teams.index')" :active="request()->routeIs('teams.*')">
+                    {{ __('Teams') }}
+                </x-nav-link>
+                <x-nav-link :href="route('players.index')" :active="request()->routeIs('players.*')">
+                    {{ __('Players') }}
+                </x-nav-link>
+                <x-nav-link :href="route('fixtures.index')" :active="request()->routeIs('fixtures.*')">
+                    {{ __('Fixtures') }}
+                </x-nav-link>
+                <x-nav-link :href="route('standings.index')" :active="request()->routeIs('standings.*')">
+                    {{ __('Standings') }}
+                </x-nav-link>
+                @auth
+                <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
+                    {{ __('Dashboard') }}
+                </x-nav-link>
+                @endauth
+            </div>
+
+            <!-- Right side: Search + Auth -->
+            <div class="hidden sm:flex sm:items-center gap-3">
+
+                <!-- Global Search Bar -->
+                <form method="GET" action="{{ route('search') }}"
+                      class="flex items-center"
+                      x-data="{ active: {{ request()->routeIs('search') ? 'true' : 'false' }} }">
+                    <div class="relative flex items-center">
+                        <input
+                            id="global-search"
+                            type="search"
+                            name="q"
+                            value="{{ request('q') }}"
+                            placeholder="Search teams, players…"
+                            autocomplete="off"
+                            @focus="active = true"
+                            @blur="if (!$el.value) active = false"
+                            :class="active ? 'w-56 border-indigo-400 ring-2 ring-indigo-100' : 'w-40 border-gray-300'"
+                            class="transition-all duration-300 rounded-lg border bg-gray-50 text-sm text-gray-900 placeholder-gray-400 pl-9 pr-3 py-1.5 focus:outline-none"
+                        >
+                        <span class="absolute left-2.5 text-gray-400 pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
+                            </svg>
+                        </span>
+                    </div>
+                </form>
+
+                <!-- Auth section -->
                 @auth
                 <x-dropdown align="right" width="48">
                     <x-slot name="trigger">
@@ -104,6 +130,29 @@
 
     <!-- Responsive Navigation Menu (mobile) -->
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
+        <!-- Mobile search -->
+        <div class="px-4 pt-3 pb-2">
+            <form method="GET" action="{{ route('search') }}" class="flex items-center gap-2">
+                <div class="relative flex-1">
+                    <input
+                        type="search"
+                        name="q"
+                        value="{{ request('q') }}"
+                        placeholder="Search teams, players, coaches…"
+                        class="w-full rounded-lg border border-gray-300 bg-gray-50 text-sm text-gray-900 placeholder-gray-400 pl-9 pr-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-300"
+                    >
+                    <span class="absolute left-2.5 top-2.5 text-gray-400 pointer-events-none">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
+                        </svg>
+                    </span>
+                </div>
+                <button type="submit" class="bg-indigo-600 text-white px-3 py-2 rounded-lg text-sm font-medium hover:bg-indigo-700 transition">
+                    Go
+                </button>
+            </form>
+        </div>
+
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('home')" :active="request()->routeIs('home')">Home</x-responsive-nav-link>
             <x-responsive-nav-link :href="route('tournaments.index')" :active="request()->routeIs('tournaments.*')">Tournaments</x-responsive-nav-link>

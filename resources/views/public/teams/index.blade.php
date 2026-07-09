@@ -37,7 +37,7 @@
             <p class="text-gray-500">We couldn't find any teams matching your search criteria.</p>
         </div>
     @else
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-10">
+        <div class="grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 mb-10">
             @foreach($teams as $team)
                 <a href="{{ route('teams.show', $team->team_id) }}" class="group bg-white border border-gray-200 rounded-2xl p-6 text-center hover:border-indigo-300 hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col h-full justify-between">
                     <div>

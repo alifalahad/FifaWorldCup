@@ -24,7 +24,18 @@ class UpdateMatchRequest extends FormRequest
                     }
                 },
             ],
-            'group_id'      => ['nullable', 'integer', 'exists:tournament_groups,group_id'],
+            'group_id'      => [
+                'nullable', 'integer', 'exists:tournament_groups,group_id',
+                function ($attribute, $value, $fail) {
+                    $stage = $this->input('stage');
+                    if ($stage === 'GROUP' && empty($value)) {
+                        $fail('A group must be selected for Group Stage matches.');
+                    }
+                    if ($stage !== 'GROUP' && !empty($value)) {
+                        $fail('Group must not be set for knockout stage matches.');
+                    }
+                },
+            ],
             'match_date'    => ['required', 'date'],
             'stage'         => ['required', Rule::in([
                 'GROUP', 'ROUND_OF_16', 'QUARTER_FINAL', 'SEMI_FINAL', 'THIRD_PLACE', 'FINAL',
@@ -40,6 +51,8 @@ class UpdateMatchRequest extends FormRequest
         return [
             'away_team_id.required' => 'Please select the away team.',
             'home_team_id.required' => 'Please select the home team.',
+            'stage.in'   => 'Stage must be one of: GROUP, ROUND_OF_16, QUARTER_FINAL, SEMI_FINAL, THIRD_PLACE, FINAL.',
+            'status.in'  => 'Status must be one of: SCHEDULED, LIVE, COMPLETED, POSTPONED, CANCELLED.',
         ];
     }
 }

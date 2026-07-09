@@ -21,7 +21,7 @@ class CoachController extends Controller
             });
         }
 
-        $coaches = $query->paginate(20)->withQueryString();
+        $coaches = $query->paginate(15)->withQueryString();
 
         return view('admin.coaches.index', compact('coaches'));
     }

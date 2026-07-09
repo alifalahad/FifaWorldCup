@@ -25,7 +25,7 @@ class StadiumController extends Controller
             $query->where('surface_type', $surface);
         }
 
-        $stadiums     = $query->paginate(20)->withQueryString();
+        $stadiums     = $query->paginate(15)->withQueryString();
         $surfaceTypes = ['GRASS', 'ARTIFICIAL', 'HYBRID'];
 
         return view('admin.stadiums.index', compact('stadiums', 'surfaceTypes'));

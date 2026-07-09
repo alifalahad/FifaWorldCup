@@ -4,28 +4,7 @@
 @section('meta_description', 'Overview of the ' . $tournament->name . ' hosted in ' . $tournament->host_country)
 
 @section('content')
-{{-- Sticky sub-nav --}}
-<div class="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-20">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center justify-between h-14">
-            <div class="flex items-baseline gap-3">
-                <a href="{{ route('tournaments.index') }}" class="text-gray-500 hover:text-indigo-600 text-sm transition">Tournaments</a>
-                <span class="text-gray-300">/</span>
-                <span class="font-bold text-gray-900 text-sm">{{ $tournament->year }} {{ $tournament->host_country }}</span>
-            </div>
-            <div class="flex gap-4 text-sm font-medium">
-                <a href="{{ route('tournaments.show', $tournament->tournament_id) }}"
-                   class="border-b-2 border-indigo-600 text-indigo-600 pb-1">Overview</a>
-                <a href="{{ route('tournaments.fixtures', $tournament->tournament_id) }}"
-                   class="border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-1 transition">Fixtures</a>
-                <a href="{{ route('tournaments.standings', $tournament->tournament_id) }}"
-                   class="border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-1 transition">Standings</a>
-                <a href="{{ route('tournaments.stats', $tournament->tournament_id) }}"
-                   class="border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-1 transition">Stats</a>
-            </div>
-        </div>
-    </div>
-</div>
+@include('public.tournaments._subnav', ['tournament' => $tournament, 'active' => 'overview'])
 
 <div class="bg-gray-900 border-b border-gray-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">

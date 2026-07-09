@@ -25,7 +25,7 @@ class PlayerController extends Controller
             $query->where('position', $position);
         }
 
-        $players   = $query->paginate(25)->withQueryString();
+        $players   = $query->paginate(15)->withQueryString();
         $positions = ['GK', 'DF', 'MF', 'FW'];
 
         return view('admin.players.index', compact('players', 'positions'));

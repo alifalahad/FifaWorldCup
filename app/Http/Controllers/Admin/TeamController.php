@@ -22,7 +22,7 @@ class TeamController extends Controller
             $query->where('continent', $continent);
         }
 
-        $teams      = $query->paginate(20)->withQueryString();
+        $teams      = $query->paginate(15)->withQueryString();
         $continents = ['AFC', 'CAF', 'CONCACAF', 'CONMEBOL', 'OFC', 'UEFA'];
 
         return view('admin.teams.index', compact('teams', 'continents'));

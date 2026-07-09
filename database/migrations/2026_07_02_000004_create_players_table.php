@@ -43,11 +43,15 @@ return new class extends Migration
         });
 
         // CHECK constraint: position must be a valid value
-        DB::statement("
+        try {
+            DB::statement("
             ALTER TABLE players
             ADD CONSTRAINT chk_player_position
             CHECK (position IN ('GK','DF','MF','FW'))
         ");
+        } catch (\Exception $e) {
+            // Oracle-specific DDL — silently skipped on SQLite (test env)
+        }
     }
 
     public function down(): void

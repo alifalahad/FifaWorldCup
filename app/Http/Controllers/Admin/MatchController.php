@@ -43,7 +43,7 @@ class MatchController extends Controller
             $query->where('status', $status);
         }
 
-        $matches     = $query->paginate(20)->withQueryString();
+        $matches     = $query->paginate(15)->withQueryString();
         $tournaments = Tournament::orderByDesc('year')->get();
 
         return view('admin.matches.index', [

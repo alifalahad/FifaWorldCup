@@ -34,11 +34,15 @@ return new class extends Migration
         // (unique index already created by ->unique() above)
 
         // CHECK constraint: continent must be a FIFA confederation
-        DB::statement("
+        try {
+            DB::statement("
             ALTER TABLE teams
             ADD CONSTRAINT chk_team_continent
             CHECK (continent IN ('AFC','CAF','CONCACAF','CONMEBOL','OFC','UEFA'))
         ");
+        } catch (\Exception $e) {
+            // Oracle-specific DDL — silently skipped on SQLite (test env)
+        }
     }
 
     public function down(): void

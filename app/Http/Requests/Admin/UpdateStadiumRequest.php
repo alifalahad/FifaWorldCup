@@ -14,12 +14,12 @@ class UpdateStadiumRequest extends FormRequest
         $stadiumId = $this->route('stadium');
 
         return [
-            'name'         => ['required', 'string', 'max:100',
+            'name'         => ['required', 'string', 'max:150',
                 Rule::unique('stadiums', 'name')->ignore($stadiumId, 'stadium_id')],
             'city'         => ['required', 'string', 'max:100'],
             'country'      => ['required', 'string', 'max:100'],
             'capacity'     => ['required', 'integer', 'min:1000', 'max:200000'],
-            'surface_type' => ['required', Rule::in(['GRASS', 'ARTIFICIAL', 'HYBRID'])],
+            'surface_type' => ['required', Rule::in(['GRASS', 'ARTIFICIAL', 'HYBRID', 'NATURAL GRASS'])],
         ];
     }
 

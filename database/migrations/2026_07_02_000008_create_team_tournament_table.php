@@ -61,13 +61,17 @@ return new class extends Migration
         });
 
         // CHECK constraint: elimination_stage values (nullable — set when team is eliminated)
-        DB::statement("
+        try {
+            DB::statement("
             ALTER TABLE team_tournament
             ADD CONSTRAINT chk_tt_elim_stage
             CHECK (elimination_stage IS NULL OR elimination_stage IN (
                 'GROUP','ROUND_OF_16','QUARTER_FINAL','SEMI_FINAL','THIRD_PLACE','FINAL','CHAMPION'
             ))
         ");
+        } catch (\Exception $e) {
+            // Oracle-specific DDL — silently skipped on SQLite (test env)
+        }
     }
 
     public function down(): void

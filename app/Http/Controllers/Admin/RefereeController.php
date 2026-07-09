@@ -21,7 +21,7 @@ class RefereeController extends Controller
             });
         }
 
-        $referees = $query->paginate(20)->withQueryString();
+        $referees = $query->paginate(15)->withQueryString();
 
         return view('admin.referees.index', compact('referees'));
     }

@@ -25,7 +25,19 @@ class StoreMatchRequest extends FormRequest
                     }
                 },
             ],
-            'group_id'      => ['nullable', 'integer', 'exists:tournament_groups,group_id'],
+            'group_id'      => [
+                'nullable', 'integer', 'exists:tournament_groups,group_id',
+                // group_id required when stage is GROUP, must be null for knockout stages
+                function ($attribute, $value, $fail) {
+                    $stage = $this->input('stage');
+                    if ($stage === 'GROUP' && empty($value)) {
+                        $fail('A group must be selected for Group Stage matches.');
+                    }
+                    if ($stage !== 'GROUP' && !empty($value)) {
+                        $fail('Group must not be set for knockout stage matches.');
+                    }
+                },
+            ],
             'match_date'    => ['required', 'date'],
             'stage'         => ['required', Rule::in([
                 'GROUP', 'ROUND_OF_16', 'QUARTER_FINAL', 'SEMI_FINAL', 'THIRD_PLACE', 'FINAL',

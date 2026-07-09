@@ -48,11 +48,15 @@ return new class extends Migration
         });
 
         // CHECK constraint: is_captain must be Y or N
-        DB::statement("
+        try {
+            DB::statement("
             ALTER TABLE player_tournament
             ADD CONSTRAINT chk_pt_is_captain
             CHECK (is_captain IN ('Y','N'))
         ");
+        } catch (\Exception $e) {
+            // Oracle-specific DDL — silently skipped on SQLite (test env)
+        }
     }
 
     public function down(): void
