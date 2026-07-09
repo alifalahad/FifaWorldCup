@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\TeamController;
 use App\Http\Controllers\Admin\CoachController;
 use App\Http\Controllers\Admin\PlayerController;
 use App\Http\Controllers\Admin\RosterController;
+use App\Http\Controllers\Admin\StadiumController;
+use App\Http\Controllers\Admin\RefereeController;
 use App\Http\Controllers\ProfileController;
 use App\Models\GroupStanding;
 use App\Models\TournamentGroup;
@@ -84,13 +86,19 @@ Route::prefix('admin')
         Route::delete('/team-tournament/{teamTournament}/roster/{playerTournament}',
             [RosterController::class, 'destroy'])->name('roster.destroy');
 
-        // Stubs for Prompts 15-17 (Stadiums, Referees, Matches)
-        Route::get('/stadiums',           fn () => $comingSoon('Stadiums'))->name('stadiums.index');
-        Route::get('/stadiums/create',    fn () => $comingSoon('Stadiums'))->name('stadiums.create');
-        Route::get('/referees',           fn () => $comingSoon('Referees'))->name('referees.index');
-        Route::get('/referees/create',    fn () => $comingSoon('Referees'))->name('referees.create');
-        Route::get('/matches',            fn () => $comingSoon('Matches'))->name('matches.index');
-        Route::get('/matches/create',     fn () => $comingSoon('Matches'))->name('matches.create');
+        // Prompt 15: Stadiums (real CRUD)
+        Route::resource('stadiums', StadiumController::class)
+            ->parameters(['stadiums' => 'stadium:stadium_id'])
+            ->except(['show']);
+
+        // Prompt 15: Referees (real CRUD)
+        Route::resource('referees', RefereeController::class)
+            ->parameters(['referees' => 'referee:referee_id'])
+            ->except(['show']);
+
+        // Stub for Prompt 16 (Matches)
+        Route::get('/matches',        fn () => $comingSoon('Matches'))->name('matches.index');
+        Route::get('/matches/create', fn () => $comingSoon('Matches'))->name('matches.create');
     });
 
 // ── Stub public nav routes (replaced by real controllers in Prompts 18-21) ─
