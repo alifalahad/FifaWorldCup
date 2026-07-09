@@ -8,6 +8,7 @@ use App\Http\Controllers\Admin\PlayerController;
 use App\Http\Controllers\Admin\RosterController;
 use App\Http\Controllers\Admin\StadiumController;
 use App\Http\Controllers\Admin\RefereeController;
+use App\Http\Controllers\Admin\MatchController;
 use App\Http\Controllers\ProfileController;
 use App\Models\GroupStanding;
 use App\Models\TournamentGroup;
@@ -96,9 +97,20 @@ Route::prefix('admin')
             ->parameters(['referees' => 'referee:referee_id'])
             ->except(['show']);
 
-        // Stub for Prompt 16 (Matches)
-        Route::get('/matches',        fn () => $comingSoon('Matches'))->name('matches.index');
-        Route::get('/matches/create', fn () => $comingSoon('Matches'))->name('matches.create');
+        // Prompt 16: Matches (real CRUD + result entry)
+        Route::resource('matches', MatchController::class)
+            ->parameters(['matches' => 'match:match_id'])
+            ->except(['show']);
+
+        // Enter result (separate form for scores/status)
+        Route::get('/matches/{match:match_id}/result',
+            [MatchController::class, 'enterResult'])->name('matches.result');
+        Route::post('/matches/{match:match_id}/result',
+            [MatchController::class, 'storeResult'])->name('matches.result.store');
+
+        // JSON API: teams + groups for a tournament (used by JS in match form)
+        Route::get('/api/tournaments/{tournament:tournament_id}/teams',
+            [MatchController::class, 'teamsForTournament'])->name('api.tournament.teams');
     });
 
 // ── Stub public nav routes (replaced by real controllers in Prompts 18-21) ─
