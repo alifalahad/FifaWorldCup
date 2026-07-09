@@ -9,6 +9,10 @@ use App\Http\Controllers\Admin\RosterController;
 use App\Http\Controllers\Admin\StadiumController;
 use App\Http\Controllers\Admin\RefereeController;
 use App\Http\Controllers\Admin\MatchController;
+use App\Http\Controllers\Admin\MatchEventController;
+use App\Http\Controllers\Public\TournamentController as PublicTournamentController;
+use App\Http\Controllers\Public\TeamController as PublicTeamController;
+use App\Http\Controllers\Public\FixtureController;
 use App\Http\Controllers\ProfileController;
 use App\Models\GroupStanding;
 use App\Models\TournamentGroup;
@@ -111,14 +115,28 @@ Route::prefix('admin')
         // JSON API: teams + groups for a tournament (used by JS in match form)
         Route::get('/api/tournaments/{tournament:tournament_id}/teams',
             [MatchController::class, 'teamsForTournament'])->name('api.tournament.teams');
+
+        // Prompt 17: Match Events (Goals and Cards)
+        Route::post('/matches/{match:match_id}/goals', [MatchEventController::class, 'storeGoal'])->name('matches.goals.store');
+        Route::delete('/matches/{match:match_id}/goals/{goal:goal_id}', [MatchEventController::class, 'destroyGoal'])->name('matches.goals.destroy');
+
+        Route::post('/matches/{match:match_id}/cards', [MatchEventController::class, 'storeCard'])->name('matches.cards.store');
+        Route::delete('/matches/{match:match_id}/cards/{card:card_id}', [MatchEventController::class, 'destroyCard'])->name('matches.cards.destroy');
     });
 
-// ── Stub public nav routes (replaced by real controllers in Prompts 18-21) ─
-Route::get('/tournaments', fn () => response('Tournaments page — coming soon!'))->name('tournaments.index');
-Route::get('/teams',       fn () => response('Teams page — coming soon!'))->name('teams.index');
+// ── Public Routes (Prompt 18 & 19) ─────────────────────────────────────────
+Route::get('/tournaments', [PublicTournamentController::class, 'index'])->name('tournaments.index');
+Route::get('/tournaments/{tournament:tournament_id}', [PublicTournamentController::class, 'show'])->name('tournaments.show');
+Route::get('/tournaments/{tournament:tournament_id}/fixtures', [FixtureController::class, 'index'])->name('tournaments.fixtures');
+Route::get('/tournaments/{tournament:tournament_id}/standings', [FixtureController::class, 'standings'])->name('tournaments.standings');
+
+Route::get('/teams', [PublicTeamController::class, 'index'])->name('teams.index');
+Route::get('/teams/{team:team_id}', [PublicTeamController::class, 'show'])->name('teams.show');
+
+// ── Stub public nav routes (replaced by real controllers in Prompts 20-21) ─
 Route::get('/players',     fn () => response('Players page — coming soon!'))->name('players.index');
-Route::get('/fixtures',    fn () => response('Fixtures page — coming soon!'))->name('fixtures.index');
-Route::get('/standings',   fn () => response('Standings page — coming soon!'))->name('standings.index');
+Route::get('/fixtures',    fn () => redirect()->route('tournaments.index'))->name('fixtures.index');
+Route::get('/standings',   fn () => redirect()->route('tournaments.index'))->name('standings.index');
 
 // ── Prompt 9: GroupStanding test route (remove after Prompt 18) ──────────
 Route::get('/test/standings', function () {

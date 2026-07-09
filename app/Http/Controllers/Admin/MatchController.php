@@ -83,9 +83,26 @@ class MatchController extends Controller
 
     public function edit(GameMatch $match)
     {
+        $match->load(['goals.scorer', 'goals.assister', 'goals.team', 'cards.player', 'cards.team']);
+
+        // Load rosters for both teams in this tournament
+        $homeRoster = \App\Models\PlayerTournament::whereHas('teamTournament', function ($q) use ($match) {
+            $q->where('tournament_id', $match->tournament_id)
+              ->where('team_id', $match->home_team_id);
+        })->with('player')->get();
+
+        $awayRoster = \App\Models\PlayerTournament::whereHas('teamTournament', function ($q) use ($match) {
+            $q->where('tournament_id', $match->tournament_id)
+              ->where('team_id', $match->away_team_id);
+        })->with('player')->get();
+
         return view('admin.matches.edit', array_merge(
             $this->formData($match->tournament_id),
-            ['match' => $match]
+            [
+                'match'      => $match,
+                'homeRoster' => $homeRoster,
+                'awayRoster' => $awayRoster,
+            ]
         ));
     }
 
