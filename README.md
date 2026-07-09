@@ -236,6 +236,8 @@ GET  /tournaments/{id}/standings            # Group standings (from GROUP_STANDI
 GET  /tournaments/{id}/stats                # Top scorers, assist leaders, disciplinary table
 GET  /teams                                 # Team list (searchable, filterable by confederation)
 GET  /teams/{id}                            # Team profile + tournament history
+GET  /players                               # Player list (searchable, filterable by position)
+GET  /players/{id}                          # Player profile + tournament history + stats
 GET  /search?q=...                          # Global search (teams, players, coaches)
 ```
 

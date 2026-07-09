@@ -15,6 +15,7 @@ use App\Http\Controllers\Public\TeamController as PublicTeamController;
 use App\Http\Controllers\Public\FixtureController;
 use App\Http\Controllers\Public\StatsController;
 use App\Http\Controllers\Public\SearchController;
+use App\Http\Controllers\Public\PlayerController as PublicPlayerController;
 use App\Http\Controllers\ProfileController;
 use App\Models\GroupStanding;
 use App\Models\TournamentGroup;
@@ -139,7 +140,8 @@ Route::get('/teams/{team:team_id}', [PublicTeamController::class, 'show'])->name
 Route::get('/search', SearchController::class)->name('search');
 
 // ── Stub public nav routes (replaced by real controllers in Prompts 20-21) ─
-Route::get('/players',     fn () => response('Players page — coming soon!'))->name('players.index');
+Route::get('/players', [PublicPlayerController::class, 'index'])->name('players.index');
+Route::get('/players/{player:player_id}', [PublicPlayerController::class, 'show'])->name('players.show');
 Route::get('/fixtures',    fn () => redirect()->route('tournaments.index'))->name('fixtures.index');
 Route::get('/standings',   fn () => redirect()->route('tournaments.index'))->name('standings.index');
 
