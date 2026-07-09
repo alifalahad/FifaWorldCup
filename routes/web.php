@@ -13,6 +13,7 @@ use App\Http\Controllers\Admin\MatchEventController;
 use App\Http\Controllers\Public\TournamentController as PublicTournamentController;
 use App\Http\Controllers\Public\TeamController as PublicTeamController;
 use App\Http\Controllers\Public\FixtureController;
+use App\Http\Controllers\Public\StatsController;
 use App\Http\Controllers\ProfileController;
 use App\Models\GroupStanding;
 use App\Models\TournamentGroup;
@@ -129,6 +130,7 @@ Route::get('/tournaments', [PublicTournamentController::class, 'index'])->name('
 Route::get('/tournaments/{tournament:tournament_id}', [PublicTournamentController::class, 'show'])->name('tournaments.show');
 Route::get('/tournaments/{tournament:tournament_id}/fixtures', [FixtureController::class, 'index'])->name('tournaments.fixtures');
 Route::get('/tournaments/{tournament:tournament_id}/standings', [FixtureController::class, 'standings'])->name('tournaments.standings');
+Route::get('/tournaments/{tournament:tournament_id}/stats', [StatsController::class, 'index'])->name('tournaments.stats');
 
 Route::get('/teams', [PublicTeamController::class, 'index'])->name('teams.index');
 Route::get('/teams/{team:team_id}', [PublicTeamController::class, 'show'])->name('teams.show');

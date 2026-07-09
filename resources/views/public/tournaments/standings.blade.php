@@ -20,6 +20,8 @@
                    class="border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-1 transition">Fixtures</a>
                 <a href="{{ route('tournaments.standings', $tournament->tournament_id) }}"
                    class="border-b-2 border-indigo-600 text-indigo-600 pb-1">Standings</a>
+                <a href="{{ route('tournaments.stats', $tournament->tournament_id) }}"
+                   class="border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-1 transition">Stats</a>
                 <a href="{{ route('tournaments.show', $tournament->tournament_id) }}"
                    class="border-b-2 border-transparent text-gray-500 hover:text-gray-700 pb-1 transition">Overview</a>
             </div>
