@@ -172,3 +172,29 @@ Route::get('/test/standings', function () {
 
 // ── Breeze auth routes (login / register / logout / etc.) ────────────────
 require __DIR__.'/auth.php';
+
+// ── Mock API Endpoint (Prompt 26) ────────────────────────────────────────
+Route::get('/api/mock/matches', function () {
+    return response()->json([
+        'data' => [
+            [
+                'match_id' => 'mock-101',
+                'date' => now()->subHours(2)->toDateTimeString(),
+                'status' => 'Match Finished',
+                'home_team' => 'Argentina',
+                'away_team' => 'France',
+                'home_score' => 3,
+                'away_score' => 3,
+            ],
+            [
+                'match_id' => 'mock-102',
+                'date' => now()->addDays(1)->toDateTimeString(),
+                'status' => 'Not Started',
+                'home_team' => 'Brazil',
+                'away_team' => 'Spain',
+                'home_score' => null,
+                'away_score' => null,
+            ]
+        ]
+    ]);
+});

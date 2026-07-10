@@ -35,4 +35,10 @@ return [
         ],
     ],
 
+    'fifa_api' => [
+        'url' => env('FIFA_API_URL', 'http://127.0.0.1:8000/api/mock'),
+        'key' => env('FIFA_API_KEY'),
+        'timeout' => env('FIFA_API_TIMEOUT', 10),
+    ],
+
 ];
