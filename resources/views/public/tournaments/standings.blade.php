@@ -6,9 +6,22 @@
 @section('content')
 @include('public.tournaments._subnav', ['tournament' => $tournament, 'active' => 'standings'])
 
-<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    <h1 class="text-3xl font-extrabold text-gray-900 mb-2">Group Stage Standings</h1>
-    <p class="text-gray-500 mb-8">{{ $tournament->name }} · {{ $tournament->year }}</p>
+<div class="relative bg-gray-900 border-b border-gray-800 overflow-hidden">
+    <div class="absolute inset-0 z-0 opacity-20">
+        <div class="absolute inset-0 bg-gradient-to-r from-indigo-800 to-purple-900 mix-blend-multiply"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+    </div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
+        <p class="text-indigo-400 font-bold tracking-widest text-xs uppercase mb-2">
+            Group Stage
+        </p>
+        <h1 class="text-3xl font-extrabold text-white sm:text-4xl drop-shadow-md">
+            {{ $tournament->name }} Standings
+        </h1>
+    </div>
+</div>
+
+<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
     @if($standingsByGroup->isEmpty())
         <div class="text-center py-20 bg-white rounded-2xl border border-gray-100">

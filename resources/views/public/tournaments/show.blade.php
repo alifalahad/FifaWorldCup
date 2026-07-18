@@ -6,28 +6,35 @@
 @section('content')
 @include('public.tournaments._subnav', ['tournament' => $tournament, 'active' => 'overview'])
 
-<div class="bg-gray-900 border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+<div class="relative bg-gray-900 border-b border-gray-800 overflow-hidden">
+    <!-- Background patterns -->
+    <div class="absolute inset-0 z-0 opacity-20">
+        <div class="absolute inset-0 bg-gradient-to-r from-indigo-800 to-purple-900 mix-blend-multiply"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+    </div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 lg:py-20">
         <div class="md:flex md:items-center md:justify-between">
             <div class="flex-1 min-w-0">
-                <p class="text-indigo-400 font-semibold tracking-wide text-sm uppercase mb-1">
-                    {{ $tournament->year }} · {{ $tournament->host_country }}
+                <p class="text-indigo-300 font-bold tracking-widest text-xs uppercase mb-3 flex items-center gap-2">
+                    <span>{{ $tournament->year }}</span>
+                    <span class="w-1.5 h-1.5 rounded-full bg-indigo-500"></span>
+                    <span>{{ $tournament->host_country }}</span>
                 </p>
-                <h1 class="text-4xl font-extrabold text-white sm:text-5xl sm:tracking-tight lg:text-6xl mb-4">
+                <h1 class="text-4xl font-extrabold text-white sm:text-5xl lg:text-6xl mb-6 drop-shadow-md">
                     {{ $tournament->name }}
                 </h1>
-                <div class="flex flex-wrap items-center gap-6 text-sm text-gray-300">
-                    <div class="flex items-center gap-2">
-                        <span class="text-lg">📅</span>
+                <div class="flex flex-wrap items-center gap-4 text-sm text-gray-300 font-medium">
+                    <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10">
+                        <span class="text-indigo-400">📅</span>
                         {{ $tournament->start_date->format('j M Y') }} – {{ $tournament->end_date->format('j M Y') }}
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-lg">🛡️</span>
+                    <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10">
+                        <span class="text-emerald-400">🛡️</span>
                         {{ $tournament->total_teams }} Teams
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-lg">🎯</span>
-                        Status: <span class="font-medium text-white">{{ $tournament->status }}</span>
+                    <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10">
+                        <span class="text-rose-400">🎯</span>
+                        Status: <span class="text-white">{{ $tournament->status }}</span>
                     </div>
                 </div>
             </div>
@@ -59,8 +66,8 @@
                                 </div>
                                 <div class="p-4">
                                     @php
-                                        // Get teams for this group
-                                        $groupTeams = $tournament->teams->filter(fn($t) => $t->pivot->group_id === $group->group_id)->sortBy('pivot->seed_position');
+                                        // Cast both to int — Oracle returns pivot values as strings
+                                        $groupTeams = $tournament->teams->filter(fn($t) => (int)$t->pivot->group_id === (int)$group->group_id)->sortBy('pivot.seed_position');
                                     @endphp
                                     
                                     @if($groupTeams->isEmpty())
@@ -88,21 +95,30 @@
 
         {{-- Right Col: All Registered Teams List --}}
         <div>
-            <div class="bg-white border border-gray-200 rounded-xl shadow-sm sticky top-6">
-                <div class="px-6 py-5 border-b border-gray-200">
-                    <h3 class="font-bold text-gray-900 text-lg">Participating Teams</h3>
+            <div class="bg-white border border-gray-100 rounded-2xl shadow-sm sticky top-32 overflow-hidden hover:shadow-md transition-shadow duration-300">
+                <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 backdrop-blur-sm">
+                    <h3 class="font-bold text-gray-900 text-lg flex items-center gap-2">
+                        <span class="w-2 h-6 bg-indigo-500 rounded-full"></span>
+                        Participating Teams
+                    </h3>
                 </div>
                 <div class="p-6">
                     @if($tournament->teams->isEmpty())
-                        <p class="text-sm text-gray-500">No teams have registered for this tournament yet.</p>
+                        <div class="text-center py-6">
+                            <span class="text-3xl mb-2 block opacity-50">🏟️</span>
+                            <p class="text-sm text-gray-500">No teams registered yet.</p>
+                        </div>
                     @else
-                        <ul class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto pr-2">
+                        <ul class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-200">
                             @foreach($tournament->teams->sortBy('country_name') as $team)
                                 <li class="py-3 flex items-center justify-between group">
-                                    <a href="{{ route('teams.show', $team->team_id) }}" class="text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition">
+                                    <a href="{{ route('teams.show', $team->team_id) }}" class="flex items-center gap-3 text-sm font-medium text-gray-700 group-hover:text-indigo-600 transition-colors">
+                                        <div class="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-500 group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">
+                                            {{ substr($team->country_name, 0, 1) }}
+                                        </div>
                                         {{ $team->country_name }}
                                     </a>
-                                    <span class="text-xs text-gray-400 bg-gray-50 px-2 py-1 rounded">{{ $team->confederation }}</span>
+                                    <span class="text-xs font-semibold text-gray-400 bg-gray-50 border border-gray-100 px-2 py-1 rounded-md">{{ $team->confederation }}</span>
                                 </li>
                             @endforeach
                         </ul>

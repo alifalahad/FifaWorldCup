@@ -4,11 +4,18 @@
 @section('meta_description', 'Browse football players, their positions, and tournament histories.')
 
 @section('content')
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-    <div class="mb-10 text-center">
-        <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight mb-3">Players</h1>
-        <p class="text-lg text-gray-500 max-w-2xl mx-auto">Explore players from around the world, check their stats, and view their tournament history.</p>
+<div class="relative bg-gray-900 border-b border-gray-800 overflow-hidden">
+    <div class="absolute inset-0 z-0 opacity-20">
+        <div class="absolute inset-0 bg-gradient-to-r from-cyan-800 to-blue-900 mix-blend-multiply"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
     </div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4 drop-shadow-md">Players</h1>
+        <p class="text-lg text-cyan-100 max-w-2xl mx-auto drop-shadow-sm">Explore players from around the world, check their stats, and view their tournament history.</p>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
 
     {{-- Filter Bar --}}
     <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-10">

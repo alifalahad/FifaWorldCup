@@ -4,64 +4,68 @@
 @section('meta_description', 'Player profile, statistics, and tournament history for ' . $player->first_name . ' ' . $player->last_name)
 
 @section('content')
-<div class="bg-gray-900 border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+<div class="relative bg-gray-900 border-b border-gray-800 overflow-hidden">
+    <div class="absolute inset-0 z-0 opacity-20">
+        <div class="absolute inset-0 bg-gradient-to-r from-cyan-800 to-blue-900 mix-blend-multiply"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+    </div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="flex flex-col md:flex-row items-center md:items-start gap-8">
             {{-- Avatar placeholder --}}
-            <div class="w-32 h-32 md:w-40 md:h-40 bg-gradient-to-br from-gray-700 to-gray-800 rounded-full border-4 border-gray-800 shadow-xl flex items-center justify-center shrink-0">
-                <span class="text-5xl font-black text-gray-500 tracking-tighter">
+            <div class="w-32 h-32 md:w-40 md:h-40 bg-white/10 backdrop-blur-md rounded-full border border-white/20 shadow-xl flex items-center justify-center shrink-0">
+                <span class="text-5xl font-black text-white/50 tracking-tighter">
                     {{ mb_substr($player->first_name, 0, 1) }}{{ mb_substr($player->last_name, 0, 1) }}
                 </span>
             </div>
 
             {{-- Player info --}}
             <div class="text-center md:text-left flex-1">
-                <div class="inline-flex items-center gap-3 mb-2">
-                    <span class="px-3 py-1 bg-gray-800 text-gray-300 rounded-full text-xs font-bold tracking-widest uppercase">
+                <div class="inline-flex items-center gap-3 mb-3">
+                    <span class="px-3 py-1 bg-cyan-900/50 border border-cyan-500/30 text-cyan-300 rounded-full text-xs font-bold tracking-widest uppercase shadow-sm">
                         {{ $player->position }}
                     </span>
-                    <span class="text-gray-400 text-sm font-medium">{{ $player->nationality }}</span>
+                    <span class="text-gray-300 text-sm font-medium">{{ $player->nationality }}</span>
                 </div>
                 
-                <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4">
+                <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-4 drop-shadow-md">
                     {{ $player->first_name }} {{ $player->last_name }}
                 </h1>
                 
-                <div class="flex flex-wrap items-center justify-center md:justify-start gap-6 text-sm text-gray-400">
+                <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 text-sm text-gray-300">
                     @if($player->date_of_birth)
-                    <div class="flex items-center gap-2">
-                        <span class="text-gray-500">Born</span>
-                        <strong class="text-gray-300">{{ \Carbon\Carbon::parse($player->date_of_birth)->format('j M Y') }}</strong>
-                        <span class="bg-gray-800 text-gray-400 px-2 py-0.5 rounded text-xs ml-1">{{ \Carbon\Carbon::parse($player->date_of_birth)->age }} yrs</span>
+                    <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10">
+                        <span class="text-cyan-400">📅</span>
+                        <strong class="text-white">{{ \Carbon\Carbon::parse($player->date_of_birth)->format('j M Y') }}</strong>
+                        <span class="bg-gray-900/50 text-gray-300 px-2 py-0.5 rounded text-xs ml-1 border border-gray-700">{{ \Carbon\Carbon::parse($player->date_of_birth)->age }} yrs</span>
                     </div>
                     @endif
                     
                     @if($player->height_cm)
-                    <div class="flex items-center gap-2">
-                        <span class="text-gray-500">Height</span>
-                        <strong class="text-gray-300">{{ $player->height_cm }} cm</strong>
+                    <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10">
+                        <span class="text-emerald-400">📏</span>
+                        <strong class="text-white">{{ $player->height_cm }} cm</strong>
                     </div>
                     @endif
                     
                     @if($player->weight_kg)
-                    <div class="flex items-center gap-2">
-                        <span class="text-gray-500">Weight</span>
-                        <strong class="text-gray-300">{{ $player->weight_kg }} kg</strong>
+                    <div class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10">
+                        <span class="text-rose-400">⚖️</span>
+                        <strong class="text-white">{{ $player->weight_kg }} kg</strong>
                     </div>
                     @endif
                 </div>
             </div>
             
             {{-- Career Stats Summary Block --}}
-            <div class="flex gap-4 md:gap-6 mt-8 md:mt-0">
+            <div class="flex gap-4 md:gap-6 mt-8 md:mt-0 bg-white/5 p-6 rounded-2xl backdrop-blur-sm border border-white/10">
                 <div class="text-center">
-                    <div class="text-3xl font-black text-white mb-1">{{ $totalGoals }}</div>
-                    <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">Goals</div>
+                    <div class="text-4xl font-black text-white mb-1 drop-shadow-sm">{{ $totalGoals }}</div>
+                    <div class="text-xs font-bold text-cyan-300 uppercase tracking-widest">Goals</div>
                 </div>
-                <div class="w-px bg-gray-800"></div>
+                <div class="w-px bg-white/20"></div>
                 <div class="text-center">
-                    <div class="text-3xl font-black text-white mb-1">{{ $totalAssists }}</div>
-                    <div class="text-xs font-bold text-gray-500 uppercase tracking-widest">Assists</div>
+                    <div class="text-4xl font-black text-white mb-1 drop-shadow-sm">{{ $totalAssists }}</div>
+                    <div class="text-xs font-bold text-cyan-300 uppercase tracking-widest">Assists</div>
                 </div>
             </div>
         </div>

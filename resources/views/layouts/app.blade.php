@@ -81,36 +81,60 @@
             </main>
 
             <!-- Footer -->
-            <footer class="bg-white border-t border-gray-200 mt-16">
-                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-8">
+            <footer class="bg-gray-900 border-t border-gray-800 mt-16 text-gray-300">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-10">
                         <div>
-                            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Navigate</h3>
-                            <ul class="space-y-2 text-sm">
-                                <li><a href="{{ route('home') }}" class="text-gray-600 hover:text-indigo-600 transition">Home</a></li>
-                                <li><a href="{{ route('tournaments.index') }}" class="text-gray-600 hover:text-indigo-600 transition">Tournaments</a></li>
-                                <li><a href="{{ route('teams.index') }}" class="text-gray-600 hover:text-indigo-600 transition">Teams</a></li>
-                                <li><a href="{{ route('players.index') }}" class="text-gray-600 hover:text-indigo-600 transition">Players</a></li>
-                            </ul>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Search</h3>
-                            <form method="GET" action="{{ route('search') }}" class="flex gap-2">
-                                <input type="search" name="q" placeholder="Search…"
-                                       class="flex-1 border border-gray-300 rounded-lg text-sm px-3 py-1.5 focus:outline-none focus:ring-2 focus:ring-indigo-300">
-                                <button type="submit" class="bg-indigo-600 text-white px-3 py-1.5 rounded-lg text-sm hover:bg-indigo-700 transition">Go</button>
-                            </form>
-                        </div>
-                        <div>
-                            <h3 class="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">{{ config('app.name') }}</h3>
-                            <p class="text-xs text-gray-500 leading-relaxed">FIFA World Cup Database — tracking tournaments, teams, players, matches and statistics.</p>
+                            <div class="flex items-center gap-2 mb-4 group">
+                                <div class="w-8 h-8 bg-indigo-500 rounded-lg flex items-center justify-center text-white font-bold shadow-md">
+                                    WC
+                                </div>
+                                <span class="font-extrabold text-xl tracking-tight text-white">
+                                    FIFA Manager
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-400 leading-relaxed mb-6">
+                                The ultimate database for tracking tournaments, teams, players, matches, and statistics. Built with modern web technologies and Oracle Database.
+                            </p>
                             @auth
-                            <a href="{{ route('dashboard') }}" class="inline-block mt-3 text-xs text-indigo-600 hover:text-indigo-800 font-medium">Admin Dashboard →</a>
+                            <a href="{{ route('dashboard') }}" class="inline-flex items-center gap-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-colors">
+                                Admin Dashboard
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                            </a>
                             @endauth
                         </div>
+                        
+                        <div class="sm:ml-auto">
+                            <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Quick Links</h3>
+                            <ul class="space-y-3 text-sm">
+                                <li><a href="{{ route('home') }}" class="hover:text-indigo-400 transition-colors flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-gray-600"></span> Home</a></li>
+                                <li><a href="{{ route('tournaments.index') }}" class="hover:text-indigo-400 transition-colors flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-gray-600"></span> Tournaments</a></li>
+                                <li><a href="{{ route('teams.index') }}" class="hover:text-indigo-400 transition-colors flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-gray-600"></span> Teams</a></li>
+                                <li><a href="{{ route('players.index') }}" class="hover:text-indigo-400 transition-colors flex items-center gap-2"><span class="w-1.5 h-1.5 rounded-full bg-gray-600"></span> Players</a></li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h3 class="text-sm font-bold text-white uppercase tracking-wider mb-4">Search</h3>
+                            <form method="GET" action="{{ route('search') }}" class="flex gap-2">
+                                <input type="search" name="q" placeholder="Search database…"
+                                       class="flex-1 bg-gray-800 border-gray-700 text-white rounded-lg text-sm px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent placeholder-gray-500">
+                                <button type="submit" class="bg-indigo-600 text-white px-4 py-2.5 rounded-lg text-sm font-medium hover:bg-indigo-500 transition-colors">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" /></svg>
+                                </button>
+                            </form>
+                        </div>
                     </div>
-                    <div class="mt-8 pt-6 border-t border-gray-100 text-center text-xs text-gray-400">
-                        © {{ date('Y') }} {{ config('app.name') }}. Built with Laravel &amp; Oracle Database.
+                    
+                    <div class="mt-12 pt-8 border-t border-gray-800 flex flex-col md:flex-row justify-between items-center gap-4">
+                        <div class="text-sm text-gray-500">
+                            &copy; {{ date('Y') }} FIFA WC Manager. All rights reserved.
+                        </div>
+                        <div class="text-xs text-gray-600 flex items-center gap-1">
+                            Built with Laravel 
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3 text-red-500" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3.172 5.172a4 4 0 015.656 0L10 6.343l1.172-1.171a4 4 0 115.656 5.656L10 17.657l-6.828-6.829a4 4 0 010-5.656z" clip-rule="evenodd" /></svg>
+                            & Oracle
+                        </div>
                     </div>
                 </div>
             </footer>

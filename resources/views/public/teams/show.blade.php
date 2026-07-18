@@ -4,22 +4,30 @@
 @section('meta_description', 'Profile, current squad, and World Cup history for ' . $team->country_name)
 
 @section('content')
-<div class="bg-gray-900 border-b border-gray-800">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+<div class="relative bg-gray-900 border-b border-gray-800 overflow-hidden">
+    <div class="absolute inset-0 z-0 opacity-20">
+        <div class="absolute inset-0 bg-gradient-to-r from-emerald-800 to-teal-900 mix-blend-multiply"></div>
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] mix-blend-overlay"></div>
+    </div>
+    <div class="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div class="md:flex md:items-center md:justify-between">
             <div class="flex items-center gap-6">
-                <div class="w-24 h-24 bg-white/10 border border-white/20 rounded-2xl flex items-center justify-center text-4xl text-white font-bold backdrop-blur-sm">
+                <div class="w-24 h-24 bg-white/10 border border-white/20 rounded-2xl flex items-center justify-center text-4xl text-white font-bold backdrop-blur-sm shadow-lg">
                     {{ mb_substr($team->country_name, 0, 1) }}
                 </div>
                 <div>
-                    <h1 class="text-4xl font-extrabold text-white sm:text-5xl sm:tracking-tight lg:text-6xl mb-2">
+                    <h1 class="text-4xl font-extrabold text-white sm:text-5xl sm:tracking-tight lg:text-6xl mb-3 drop-shadow-md">
                         {{ $team->country_name }}
                     </h1>
-                    <div class="flex items-center gap-4 text-sm text-indigo-300 font-medium">
-                        <span class="bg-indigo-900/50 px-3 py-1 rounded-full border border-indigo-700/50">{{ $team->abbreviation }}</span>
-                        <span>{{ $team->continent }}</span>
+                    <div class="flex flex-wrap items-center gap-4 text-sm text-emerald-300 font-medium">
+                        <span class="bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10 text-white font-mono shadow-sm">
+                            {{ $team->abbreviation }}
+                        </span>
+                        <span class="bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10 shadow-sm">
+                            {{ $team->continent }}
+                        </span>
                         @if($team->fifa_ranking)
-                        <span class="flex items-center gap-1">
+                        <span class="flex items-center gap-2 bg-white/10 px-3 py-1.5 rounded-lg backdrop-blur-sm border border-white/10 shadow-sm">
                             <span>FIFA Rank:</span>
                             <span class="text-white font-bold">#{{ $team->fifa_ranking }}</span>
                         </span>
@@ -111,27 +119,34 @@
 
         {{-- Right Col: Tournament History --}}
         <div>
-            <div class="bg-white border border-gray-200 rounded-2xl shadow-sm sticky top-6">
-                <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50">
-                    <h3 class="font-bold text-gray-900 text-lg">World Cup History</h3>
+            <div class="bg-white border border-gray-100 rounded-2xl shadow-sm sticky top-6 overflow-hidden hover:shadow-md transition-shadow duration-300">
+                <div class="px-6 py-5 border-b border-gray-100 bg-gray-50/50 backdrop-blur-sm">
+                    <h3 class="font-bold text-gray-900 text-lg flex items-center gap-2">
+                        <span class="w-2 h-6 bg-emerald-500 rounded-full"></span>
+                        World Cup History
+                    </h3>
                 </div>
                 <div class="p-0">
                     @if($team->teamTournaments->isEmpty())
-                        <div class="p-6 text-sm text-gray-700 font-medium text-center">
+                        <div class="p-6 text-sm text-gray-500 font-medium text-center py-12">
+                            <span class="text-3xl block mb-2 opacity-50">📜</span>
                             No tournament history found.
                         </div>
                     @else
-                        <ul class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto">
+                        <ul class="divide-y divide-gray-100 max-h-[600px] overflow-y-auto scrollbar-thin scrollbar-thumb-gray-200">
                             @foreach($team->teamTournaments as $history)
-                                <li class="p-4 hover:bg-gray-50 transition">
+                                <li class="p-4 hover:bg-gray-50 transition-colors group">
                                     <a href="{{ route('tournaments.show', $history->tournament_id) }}" class="block">
                                         <div class="flex justify-between items-start mb-1">
-                                            <span class="font-bold text-gray-900 group-hover:text-indigo-600">{{ $history->tournament->year }}</span>
-                                            <span class="text-xs text-gray-700 font-medium">{{ $history->elimination_stage ?? 'Active' }}</span>
+                                            <span class="font-bold text-gray-900 group-hover:text-emerald-600 transition-colors">{{ $history->tournament->year }}</span>
+                                            <span class="text-xs text-gray-500 font-semibold bg-gray-100 px-2 py-0.5 rounded-md border border-gray-200">{{ $history->elimination_stage ?? 'Active' }}</span>
                                         </div>
-                                        <p class="text-sm font-semibold text-gray-800">{{ $history->tournament->name }}</p>
+                                        <p class="text-sm font-semibold text-gray-700">{{ $history->tournament->name }}</p>
                                         @if($history->group)
-                                            <p class="text-xs font-semibold text-gray-600 mt-2">Group {{ $history->group->group_name }}</p>
+                                            <p class="text-xs font-semibold text-gray-500 mt-2 flex items-center gap-1">
+                                                <span class="w-1.5 h-1.5 bg-gray-300 rounded-full"></span>
+                                                Group {{ $history->group->group_name }}
+                                            </p>
                                         @endif
                                     </a>
                                 </li>

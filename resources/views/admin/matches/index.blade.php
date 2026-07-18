@@ -117,12 +117,10 @@
                 </td>
                 <td class="px-4 py-3 text-center">
                     <div class="flex items-center justify-center gap-2">
-                        @if(in_array($match->status, ['SCHEDULED', 'LIVE']))
                         <a href="{{ route('admin.matches.result', $match->match_id) }}"
                            class="text-xs font-medium text-green-600 hover:text-green-800 bg-green-50 hover:bg-green-100 px-2 py-0.5 rounded transition">
                             Result
                         </a>
-                        @endif
                         <a href="{{ route('admin.matches.edit', $match->match_id) }}"
                            class="text-xs font-medium text-gray-500 hover:text-indigo-600">Edit</a>
                         <form method="POST" action="{{ route('admin.matches.destroy', $match->match_id) }}"
