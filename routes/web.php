@@ -16,6 +16,10 @@ use App\Http\Controllers\Public\FixtureController;
 use App\Http\Controllers\Public\StatsController;
 use App\Http\Controllers\Public\SearchController;
 use App\Http\Controllers\Public\PlayerController as PublicPlayerController;
+use App\Http\Controllers\Api\SearchSuggestController;
+use App\Http\Controllers\Api\LiveScoresController;
+use App\Http\Controllers\Api\TournamentGroupsController;
+use App\Http\Controllers\Api\DashboardStatsController;
 use App\Http\Controllers\ProfileController;
 use App\Models\GroupStanding;
 use App\Models\TournamentGroup;
@@ -146,6 +150,10 @@ Route::get('/teams', [PublicTeamController::class, 'index'])->name('teams.index'
 Route::get('/teams/{team:team_id}', [PublicTeamController::class, 'show'])->name('teams.show');
 
 Route::get('/search', SearchController::class)->name('search');
+Route::get('/api/search/suggest', SearchSuggestController::class)->name('api.search.suggest');
+Route::get('/api/tournaments/{tournament:tournament_id}/live-scores', LiveScoresController::class)->name('api.live-scores');
+Route::get('/api/tournaments/{tournament:tournament_id}/groups', TournamentGroupsController::class)->name('api.tournament.groups');
+Route::get('/api/dashboard/stats', DashboardStatsController::class)->name('api.dashboard.stats');
 
 // ── Stub public nav routes (replaced by real controllers in Prompts 20-21) ─
 Route::get('/players', [PublicPlayerController::class, 'index'])->name('players.index');

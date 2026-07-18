@@ -56,25 +56,103 @@
             @enderror
         </div>
 
-        {{-- Group assignment --}}
-        <div>
-            <label for="group_id" class="block text-sm font-medium text-gray-700 mb-1">
+        {{-- ── Dynamic Group Assignment (Alpine.js + API) ──────────────────── --}}
+        <div
+            x-data="{
+                groups: [],
+                selectedGroup: '{{ old('group_id') }}',
+                loading: false,
+                loaded: false,
+
+                async loadGroups() {
+                    this.loading = true;
+                    try {
+                        const res  = await fetch('/api/tournaments/{{ $tournament->tournament_id }}/groups');
+                        const data = await res.json();
+                        this.groups = data.groups;
+                        this.loaded = true;
+                    } catch(e) {
+                        this.groups = [];
+                    } finally {
+                        this.loading = false;
+                    }
+                }
+            }"
+            x-init="loadGroups()"
+        >
+            <label class="block text-sm font-medium text-gray-700 mb-1">
                 Group <span class="text-gray-400">(optional — assign to a group)</span>
             </label>
-            @if($groups->isEmpty())
-            <p class="text-xs text-gray-400 italic mt-1">No groups exist for this tournament yet.</p>
-            <input type="hidden" name="group_id" value="">
-            @else
-            <select id="group_id" name="group_id"
-                    class="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                <option value="">Unassigned</option>
-                @foreach($groups as $group)
-                <option value="{{ $group->group_id }}" {{ old('group_id') == $group->group_id ? 'selected' : '' }}>
-                    Group {{ $group->group_name }}
-                </option>
-                @endforeach
-            </select>
-            @endif
+
+            {{-- Loading spinner --}}
+            <div x-show="loading" class="flex items-center gap-2 text-sm text-gray-400 py-2">
+                <svg class="h-4 w-4 animate-spin text-indigo-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                Loading groups…
+            </div>
+
+            {{-- No groups state --}}
+            <template x-if="loaded && groups.length === 0">
+                <p class="text-xs text-gray-400 italic mt-1">No groups exist for this tournament yet.</p>
+            </template>
+
+            {{-- Group card-picker grid --}}
+            <template x-if="loaded && groups.length > 0">
+                <div class="space-y-3">
+                    {{-- Hidden input that carries the actual submitted value --}}
+                    <input type="hidden" name="group_id" :value="selectedGroup">
+
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2">
+
+                        {{-- "Unassigned" card --}}
+                        <button
+                            type="button"
+                            @click="selectedGroup = ''"
+                            :class="selectedGroup === ''
+                                ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200'
+                                : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'"
+                            class="relative flex flex-col items-center justify-center px-3 py-3 rounded-lg border text-sm font-medium transition-all duration-150 cursor-pointer"
+                        >
+                            <span class="text-lg mb-0.5">🚫</span>
+                            <span :class="selectedGroup === '' ? 'text-indigo-700' : 'text-gray-600'"
+                                  class="font-semibold text-xs">Unassigned</span>
+                        </button>
+
+                        {{-- Dynamic group cards --}}
+                        <template x-for="group in groups" :key="group.group_id">
+                            <button
+                                type="button"
+                                @click="selectedGroup = group.group_id"
+                                :class="String(selectedGroup) === String(group.group_id)
+                                    ? 'border-indigo-500 bg-indigo-50 ring-2 ring-indigo-200'
+                                    : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'"
+                                class="relative flex flex-col items-center justify-center px-3 py-3 rounded-lg border transition-all duration-150 cursor-pointer"
+                            >
+                                {{-- Team count badge (top-right corner) --}}
+                                <span
+                                    class="absolute top-1.5 right-1.5 inline-flex items-center justify-center w-5 h-5 text-[10px] font-bold rounded-full"
+                                    :class="group.team_count > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-gray-100 text-gray-400'"
+                                    x-text="group.team_count"
+                                ></span>
+                                <span class="text-lg mb-0.5">🏟️</span>
+                                <span
+                                    :class="String(selectedGroup) === String(group.group_id) ? 'text-indigo-700' : 'text-gray-700'"
+                                    class="font-bold text-xs"
+                                    x-text="'Group ' + group.group_name"
+                                ></span>
+                                <span class="text-[10px] text-gray-400 mt-0.5" x-text="group.team_count + ' team(s)'"></span>
+                            </button>
+                        </template>
+                    </div>
+
+                    <p class="text-xs text-gray-400">
+                        The badge number shows how many teams are already in each group.
+                    </p>
+                </div>
+            </template>
+
             @error('group_id')<p class="mt-1 text-xs text-red-600">{{ $message }}</p>@enderror
         </div>
 

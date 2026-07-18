@@ -61,7 +61,11 @@
                         $isLive      = $match->status === 'ONGOING';
                         $isScheduled = $match->status === 'SCHEDULED';
                     @endphp
-                    <div class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md hover:border-indigo-200 transition-all duration-200">
+                    <div
+                        class="bg-white border border-gray-200 rounded-xl shadow-sm overflow-hidden hover:shadow-md hover:border-indigo-200 transition-all duration-200"
+                        data-match-id="{{ $match->match_id }}"
+                        data-match-status="{{ $match->status }}"
+                    >
                         <div class="px-4 py-3">
                             {{-- Status badge + date row --}}
                             <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
@@ -72,18 +76,28 @@
                                         <span>{{ $match->stadium->stadium_name }}</span>
                                     @endif
                                 </div>
-                                @if($isLive)
-                                    <span class="inline-flex items-center gap-1.5 bg-red-100 text-red-700 font-bold text-xs px-2.5 py-0.5 rounded-full ring-1 ring-red-300">
+                                {{-- Status badge: live badge has JS-updatable id --}}
+                                <span
+                                    id="badge-{{ $match->match_id }}"
+                                    @if($isLive)
+                                        class="inline-flex items-center gap-1.5 bg-red-100 text-red-700 font-bold text-xs px-2.5 py-0.5 rounded-full ring-1 ring-red-300"
+                                    @elseif($isCompleted)
+                                        class="bg-gray-100 text-gray-600 text-xs px-2.5 py-0.5 rounded-full font-medium"
+                                    @else
+                                        class="bg-blue-50 text-blue-600 text-xs px-2.5 py-0.5 rounded-full font-medium"
+                                    @endif
+                                >
+                                    @if($isLive)
                                         <span class="w-1.5 h-1.5 bg-red-600 rounded-full animate-pulse"></span>
                                         LIVE
-                                    </span>
-                                @elseif($isCompleted)
-                                    <span class="bg-gray-100 text-gray-600 text-xs px-2.5 py-0.5 rounded-full font-medium">FT</span>
-                                @elseif($isScheduled)
-                                    <span class="bg-blue-50 text-blue-600 text-xs px-2.5 py-0.5 rounded-full font-medium">Upcoming</span>
-                                @else
-                                    <span class="bg-gray-50 text-gray-500 text-xs px-2.5 py-0.5 rounded-full font-medium">{{ $match->status }}</span>
-                                @endif
+                                    @elseif($isCompleted)
+                                        FT
+                                    @elseif($isScheduled)
+                                        Upcoming
+                                    @else
+                                        {{ $match->status }}
+                                    @endif
+                                </span>
                             </div>
 
                             {{-- Main score row --}}
@@ -98,25 +112,29 @@
                                 </div>
 
                                 {{-- Score / VS --}}
-                                <div class="mx-6 text-center min-w-[80px]">
+                                <div class="mx-6 text-center min-w-[80px]" id="score-wrap-{{ $match->match_id }}">
                                     @if($isCompleted || $isLive)
                                         <div class="flex items-center justify-center gap-2">
-                                            <span class="text-3xl font-black {{ $match->home_score > $match->away_score ? 'text-gray-900' : 'text-gray-400' }}">
+                                            <span id="home-score-{{ $match->match_id }}" class="text-3xl font-black {{ $match->home_score > $match->away_score ? 'text-gray-900' : 'text-gray-400' }}">
                                                 {{ $match->home_score }}
                                             </span>
                                             <span class="text-gray-300 font-light text-xl">–</span>
-                                            <span class="text-3xl font-black {{ $match->away_score > $match->home_score ? 'text-gray-900' : 'text-gray-400' }}">
+                                            <span id="away-score-{{ $match->match_id }}" class="text-3xl font-black {{ $match->away_score > $match->home_score ? 'text-gray-900' : 'text-gray-400' }}">
                                                 {{ $match->away_score }}
                                             </span>
                                         </div>
-                                        {{-- Extra time / Penalties indicator --}}
                                         @if($match->has_penalties === 'Y')
-                                            <div class="text-xs text-gray-400 mt-1">After Penalties</div>
+                                            <div id="score-note-{{ $match->match_id }}" class="text-xs text-gray-400 mt-1">After Penalties</div>
                                         @elseif($match->has_extra_time === 'Y')
-                                            <div class="text-xs text-gray-400 mt-1">After Extra Time</div>
+                                            <div id="score-note-{{ $match->match_id }}" class="text-xs text-gray-400 mt-1">After Extra Time</div>
+                                        @else
+                                            <div id="score-note-{{ $match->match_id }}" class="text-xs text-gray-400 mt-1 hidden"></div>
                                         @endif
                                     @else
-                                        <span class="text-2xl font-semibold text-gray-300">vs</span>
+                                        <span class="text-2xl font-semibold text-gray-300" id="vs-label-{{ $match->match_id }}">vs</span>
+                                        <div id="home-score-{{ $match->match_id }}" class="hidden"></div>
+                                        <div id="away-score-{{ $match->match_id }}" class="hidden"></div>
+                                        <div id="score-note-{{ $match->match_id }}" class="hidden"></div>
                                     @endif
                                 </div>
 
@@ -138,4 +156,95 @@
         </div>
     @endif
 </div>
+
+{{-- ─────────────────────────────────────────────────────────────────────────
+     Live Score Poller
+     Polls the internal API every 30 seconds when there are ONGOING matches.
+     Updates only the score elements in the DOM — no page refresh needed.
+──────────────────────────────────────────────────────────────────────────── --}}
+<script>
+(function () {
+    const TOURNAMENT_ID = {{ $tournament->tournament_id }};
+    const API_URL       = `/api/tournaments/${TOURNAMENT_ID}/live-scores`;
+    const INTERVAL_MS   = 30000; // 30 seconds
+
+    // Track whether there are any live match cards currently on the page
+    function getLiveCards() {
+        return document.querySelectorAll('[data-match-status="ONGOING"]');
+    }
+
+    function updateMatchCard(match) {
+        const homeEl  = document.getElementById(`home-score-${match.match_id}`);
+        const awayEl  = document.getElementById(`away-score-${match.match_id}`);
+        const noteEl  = document.getElementById(`score-note-${match.match_id}`);
+        const vsEl    = document.getElementById(`vs-label-${match.match_id}`);
+        const badgeEl = document.getElementById(`badge-${match.match_id}`);
+        const card    = document.querySelector(`[data-match-id="${match.match_id}"]`);
+
+        if (!homeEl || !awayEl) return;
+
+        // Show scores (hide "vs" if it was there before)
+        if (vsEl) vsEl.classList.add('hidden');
+        homeEl.classList.remove('hidden');
+        awayEl.classList.remove('hidden');
+
+        homeEl.textContent = match.home_score;
+        awayEl.textContent = match.away_score;
+
+        // Bold the winning side
+        homeEl.className = homeEl.className.replace(/text-(gray-900|gray-400)/g, '');
+        awayEl.className = awayEl.className.replace(/text-(gray-900|gray-400)/g, '');
+        homeEl.classList.add(match.home_score > match.away_score ? 'text-gray-900' : 'text-gray-400');
+        awayEl.classList.add(match.away_score > match.home_score ? 'text-gray-900' : 'text-gray-400');
+
+        // Extra time / penalty note
+        if (noteEl) {
+            if (match.has_penalties === 'Y') {
+                noteEl.textContent = 'After Penalties';
+                noteEl.classList.remove('hidden');
+            } else if (match.has_extra_time === 'Y') {
+                noteEl.textContent = 'After Extra Time';
+                noteEl.classList.remove('hidden');
+            }
+        }
+
+        // If match just completed, update badge and card attribute
+        if (match.status === 'COMPLETED' && badgeEl) {
+            badgeEl.className = 'bg-gray-100 text-gray-600 text-xs px-2.5 py-0.5 rounded-full font-medium';
+            badgeEl.innerHTML = 'FT';
+            if (card) card.setAttribute('data-match-status', 'COMPLETED');
+        }
+
+        // Flash effect on score update
+        if (homeEl && awayEl) {
+            const wrap = document.getElementById(`score-wrap-${match.match_id}`);
+            if (wrap) {
+                wrap.style.transition = 'background-color 0.3s';
+                wrap.style.backgroundColor = '#eef2ff'; // indigo-50
+                setTimeout(() => { wrap.style.backgroundColor = ''; }, 600);
+            }
+        }
+    }
+
+    async function poll() {
+        // Only poll if there are still ONGOING matches visible
+        if (getLiveCards().length === 0) return;
+
+        try {
+            const res  = await fetch(API_URL);
+            if (!res.ok) return;
+            const data = await res.json();
+            data.matches.forEach(updateMatchCard);
+        } catch (e) {
+            // Silently ignore network errors — next poll will retry
+        }
+    }
+
+    // Start polling only if there are live matches on the page right now
+    if (getLiveCards().length > 0) {
+        console.log(`[LiveScore] ${getLiveCards().length} ONGOING match(es) detected. Polling every ${INTERVAL_MS / 1000}s.`);
+        setInterval(poll, INTERVAL_MS);
+    }
+})();
+</script>
 @endsection

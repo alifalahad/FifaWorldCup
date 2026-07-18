@@ -45,30 +45,185 @@
             <!-- Right side: Search + Auth -->
             <div class="hidden sm:flex sm:items-center gap-3">
 
-                <!-- Global Search Bar -->
-                <form method="GET" action="{{ route('search') }}"
-                      class="flex items-center"
-                      x-data="{ active: {{ request()->routeIs('search') ? 'true' : 'false' }} }">
+                <!-- Live Global Search -->
+                <div
+                    x-data="{
+                        q: '{{ request('q') }}',
+                        open: false,
+                        loading: false,
+                        results: { teams: [], players: [], coaches: [] },
+                        timer: null,
+                        get hasResults() {
+                            return this.results.teams.length > 0
+                                || this.results.players.length > 0
+                                || this.results.coaches.length > 0;
+                        },
+                        fetch() {
+                            clearTimeout(this.timer);
+                            if (this.q.trim().length < 2) {
+                                this.results = { teams: [], players: [], coaches: [] };
+                                this.open = false;
+                                return;
+                            }
+                            this.loading = true;
+                            this.timer = setTimeout(() => {
+                                fetch(`/api/search/suggest?q=${encodeURIComponent(this.q)}`)
+                                    .then(r => r.json())
+                                    .then(data => {
+                                        this.results = data;
+                                        this.open = this.hasResults;
+                                        this.loading = false;
+                                    })
+                                    .catch(() => { this.loading = false; });
+                            }, 220);
+                        },
+                        go(url) {
+                            this.open = false;
+                            window.location.href = url;
+                        },
+                        submit() {
+                            if (this.q.trim().length > 0) {
+                                window.location.href = '{{ route('search') }}?q=' + encodeURIComponent(this.q);
+                            }
+                        }
+                    }"
+                    @click.outside="open = false"
+                    class="relative"
+                >
+                    <!-- Input -->
                     <div class="relative flex items-center">
                         <input
+                            x-ref="searchInput"
                             id="global-search"
-                            type="search"
+                            type="text"
                             name="q"
-                            value="{{ request('q') }}"
+                            x-model="q"
+                            @input="fetch()"
+                            @keydown.enter.prevent="submit()"
+                            @keydown.escape="open = false"
+                            @focus="if (hasResults) open = true"
                             placeholder="Search teams, players…"
                             autocomplete="off"
-                            @focus="active = true"
-                            @blur="if (!$el.value) active = false"
-                            :class="active ? 'w-56 border-indigo-400 ring-2 ring-indigo-100' : 'w-40 border-gray-300'"
-                            class="transition-all duration-300 rounded-lg border bg-gray-50 text-sm text-gray-900 placeholder-gray-400 pl-9 pr-3 py-1.5 focus:outline-none"
+                            :class="open || q.length > 0 ? 'w-64 border-indigo-500 ring-4 ring-indigo-500/10 bg-white shadow-sm' : 'w-44 border-gray-300 bg-gray-50/50 hover:bg-gray-50'"
+                            class="transition-all duration-300 rounded-lg border text-sm text-gray-900 placeholder-gray-400 pl-10 pr-10 py-2 focus:outline-none"
                         >
-                        <span class="absolute left-2.5 text-gray-400 pointer-events-none">
+                        <!-- Search icon -->
+                        <span class="absolute left-3 text-gray-400 pointer-events-none transition-colors duration-200" :class="open || q.length > 0 ? 'text-indigo-500' : ''">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 115 11a6 6 0 0112 0z" />
                             </svg>
                         </span>
+                        
+                        <!-- Clear Button -->
+                        <button 
+                            type="button"
+                            x-show="q.length > 0 && !loading"
+                            @click="q = ''; fetch(); $refs.searchInput.focus()"
+                            class="absolute right-3 text-gray-400 hover:text-gray-600 transition-colors"
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                        </button>
+
+                        <!-- Loading spinner -->
+                        <span x-show="loading" class="absolute right-3 text-indigo-500">
+                            <svg class="h-3.5 w-3.5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                            </svg>
+                        </span>
                     </div>
-                </form>
+
+                    <!-- Dropdown -->
+                    <div
+                        x-show="open"
+                        x-transition:enter="transition ease-out duration-150"
+                        x-transition:enter-start="opacity-0 scale-95 translate-y-1"
+                        x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                        x-transition:leave="transition ease-in duration-100"
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute top-full right-0 mt-2 w-80 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden"
+                        style="display: none;"
+                    >
+                        <!-- Teams section -->
+                        <template x-if="results.teams.length > 0">
+                            <div>
+                                <div class="px-3 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">Teams</div>
+                                <template x-for="item in results.teams" :key="item.id">
+                                    <button
+                                        @click="go(item.url)"
+                                        class="w-full flex items-center gap-3 px-3 py-2 hover:bg-indigo-50 group transition-colors text-left"
+                                    >
+                                        <div class="w-7 h-7 rounded-lg bg-indigo-50 group-hover:bg-indigo-100 flex items-center justify-center text-sm transition-colors shrink-0">
+                                            🛡️
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="text-sm font-semibold text-gray-900 truncate" x-text="item.label"></div>
+                                            <div class="text-xs text-gray-400 truncate" x-text="item.meta"></div>
+                                        </div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-300 group-hover:text-indigo-400 transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+
+                        <!-- Players section -->
+                        <template x-if="results.players.length > 0">
+                            <div>
+                                <div class="px-3 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400" :class="results.teams.length > 0 ? 'border-t border-gray-50' : ''">Players</div>
+                                <template x-for="item in results.players" :key="item.id">
+                                    <button
+                                        @click="go(item.url)"
+                                        class="w-full flex items-center gap-3 px-3 py-2 hover:bg-emerald-50 group transition-colors text-left"
+                                    >
+                                        <div class="w-7 h-7 rounded-lg bg-emerald-50 group-hover:bg-emerald-100 flex items-center justify-center text-sm transition-colors shrink-0">
+                                            ⚽
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="text-sm font-semibold text-gray-900 truncate" x-text="item.label"></div>
+                                            <div class="text-xs text-gray-400 truncate" x-text="item.meta"></div>
+                                        </div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-300 group-hover:text-emerald-400 transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+
+                        <!-- Coaches section -->
+                        <template x-if="results.coaches.length > 0">
+                            <div>
+                                <div class="px-3 pt-2.5 pb-1 text-[10px] font-bold uppercase tracking-widest text-gray-400" :class="results.players.length > 0 || results.teams.length > 0 ? 'border-t border-gray-50' : ''">Coaches</div>
+                                <template x-for="item in results.coaches" :key="item.id">
+                                    <button
+                                        @click="go(item.url)"
+                                        class="w-full flex items-center gap-3 px-3 py-2 hover:bg-rose-50 group transition-colors text-left"
+                                    >
+                                        <div class="w-7 h-7 rounded-lg bg-rose-50 group-hover:bg-rose-100 flex items-center justify-center text-sm transition-colors shrink-0">
+                                            🏋️
+                                        </div>
+                                        <div class="min-w-0 flex-1">
+                                            <div class="text-sm font-semibold text-gray-900 truncate" x-text="item.label"></div>
+                                            <div class="text-xs text-gray-400 truncate" x-text="item.meta"></div>
+                                        </div>
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-3.5 w-3.5 text-gray-300 group-hover:text-rose-400 transition-colors shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                                    </button>
+                                </template>
+                            </div>
+                        </template>
+
+                        <!-- View all results footer -->
+                        <div class="border-t border-gray-100 px-3 py-2">
+                            <button
+                                @click="submit()"
+                                class="w-full text-center text-xs font-semibold text-indigo-600 hover:text-indigo-800 py-1 transition-colors"
+                            >
+                                View all results for "<span x-text="q"></span>" →
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
                 <!-- Auth section -->
                 @auth
