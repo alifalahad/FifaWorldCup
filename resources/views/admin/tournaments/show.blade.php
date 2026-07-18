@@ -82,54 +82,25 @@
         <h2 class="text-sm font-semibold text-gray-700">Groups
             <span class="ml-2 text-xs font-normal text-gray-400">({{ $tournament->groups->count() }} created)</span>
         </h2>
+        <a href="{{ route('admin.tournaments.edit', $tournament->tournament_id) }}"
+           class="text-xs text-indigo-600 hover:text-indigo-800 font-medium">
+            Manage Groups →
+        </a>
     </div>
-
-    {{-- Existing groups --}}
     @if($tournament->groups->isEmpty())
     <div class="px-6 py-4 text-sm text-gray-400 italic">
-        No groups yet. Use the form below to add groups (e.g. A, B, C…).
+        No groups yet.
+        <a href="{{ route('admin.tournaments.edit', $tournament->tournament_id) }}" class="text-indigo-600 hover:underline">Go to Edit Tournament to add groups.</a>
     </div>
     @else
     <div class="flex flex-wrap gap-3 px-6 py-4">
         @foreach($tournament->groups->sortBy('group_name') as $group)
-        <div class="flex items-center gap-1 bg-indigo-50 border border-indigo-200 rounded-lg px-3 py-2">
-            <span class="text-base font-bold text-indigo-700">{{ $group->group_name }}</span>
-            <form method="POST"
-                  action="{{ route('admin.tournaments.groups.destroy', [$tournament->tournament_id, $group->group_id]) }}"
-                  onsubmit="return confirm('Remove Group {{ $group->group_name }}? Teams in this group will be unassigned.')"
-                  class="ml-2">
-                @csrf
-                @method('DELETE')
-                <button type="submit" class="text-red-400 hover:text-red-600 text-xs font-bold leading-none" title="Remove group">✕</button>
-            </form>
+        <div class="flex items-center justify-center w-12 h-12 rounded-lg bg-indigo-50 border border-indigo-200">
+            <span class="text-lg font-bold text-indigo-700">{{ $group->group_name }}</span>
         </div>
         @endforeach
     </div>
     @endif
-
-    {{-- Add group form --}}
-    <div class="px-6 py-4 border-t border-gray-100 bg-gray-50 rounded-b-lg">
-        <form method="POST"
-              action="{{ route('admin.tournaments.groups.store', $tournament->tournament_id) }}"
-              class="flex items-end gap-3">
-            @csrf
-            <div>
-                <label for="group_name" class="block text-xs font-medium text-gray-600 mb-1">Add Group</label>
-                <input type="text" id="group_name" name="group_name"
-                       placeholder="e.g. A"
-                       maxlength="10"
-                       value="{{ old('group_name') }}"
-                       class="border {{ $errors->has('group_name') ? 'border-red-400' : 'border-gray-300' }} rounded-md px-3 py-2 text-sm w-32 focus:outline-none focus:ring-2 focus:ring-indigo-400">
-                @error('group_name')
-                <p class="mt-1 text-xs text-red-600">{{ $message }}</p>
-                @enderror
-            </div>
-            <button type="submit"
-                    class="bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium px-4 py-2 rounded-md transition">
-                + Add Group
-            </button>
-        </form>
-    </div>
 </div>
 
 {{-- Registered Teams --}}

@@ -80,6 +80,7 @@ class TournamentController extends Controller
      */
     public function edit(Tournament $tournament)
     {
+        $tournament->load('groups');
         $statuses = ['PLANNED', 'ONGOING', 'COMPLETED', 'CANCELLED'];
         return view('admin.tournaments.edit', compact('tournament', 'statuses'));
     }
