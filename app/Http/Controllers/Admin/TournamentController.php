@@ -9,6 +9,7 @@ use App\Models\Coach;
 use App\Models\Team;
 use App\Models\TeamTournament;
 use App\Models\Tournament;
+use App\Models\TournamentGroup;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -107,6 +108,51 @@ class TournamentController extends Controller
         return redirect()
             ->route('admin.tournaments.index')
             ->with('success', "Tournament \"{$name}\" deleted.");
+    }
+
+    /**
+     * Add a new group to this tournament.
+     */
+    public function addGroup(Request $request, Tournament $tournament)
+    {
+        $validated = $request->validate([
+            'group_name' => [
+                'required',
+                'string',
+                'max:10',
+                // A group name must be unique within the same tournament
+                Rule::unique('tournament_groups', 'group_name')
+                    ->where('tournament_id', $tournament->tournament_id),
+            ],
+        ], [
+            'group_name.unique' => 'Group "' . $request->group_name . '" already exists for this tournament.',
+        ]);
+
+        TournamentGroup::create([
+            'tournament_id' => $tournament->tournament_id,
+            'group_name'    => strtoupper(trim($validated['group_name'])),
+        ]);
+
+        return redirect()
+            ->route('admin.tournaments.show', $tournament->tournament_id)
+            ->with('success', 'Group "' . strtoupper($request->group_name) . '" added successfully.');
+    }
+
+    /**
+     * Remove a group from this tournament.
+     */
+    public function removeGroup(Tournament $tournament, TournamentGroup $group)
+    {
+        if ($group->tournament_id !== $tournament->tournament_id) {
+            abort(403, 'This group does not belong to this tournament.');
+        }
+
+        $name = $group->group_name;
+        $group->delete();
+
+        return redirect()
+            ->route('admin.tournaments.show', $tournament->tournament_id)
+            ->with('success', 'Group "' . $name . '" removed.');
     }
 
     /**

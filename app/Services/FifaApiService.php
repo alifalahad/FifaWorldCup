@@ -28,15 +28,15 @@ class FifaApiService
     {
         try {
             $response = Http::withHeaders([
-                'X-API-Key' => $this->apiKey,
-                'Accept'    => 'application/json',
+                'X-Auth-Token' => $this->apiKey,
+                'Accept'       => 'application/json',
             ])
             ->timeout($this->timeout)
-            ->get("{$this->baseUrl}/matches");
+            ->get("{$this->baseUrl}/competitions/WC/matches");
 
             if ($response->successful()) {
-                // Return the matches array wrapped in a Laravel Collection
-                return collect($response->json('data', []));
+                // Football-data wraps the results in a 'matches' array
+                return collect($response->json('matches', []));
             }
 
             Log::error('FIFA API error response', [

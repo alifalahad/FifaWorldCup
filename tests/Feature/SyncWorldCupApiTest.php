@@ -20,15 +20,17 @@ class SyncWorldCupApiTest extends FifaTestCase
         // 1. Fake the HTTP response so we don't make real network calls
         Http::fake([
             config('services.fifa_api.url') . '/*' => Http::response([
-                'data' => [
+                'matches' => [
                     [
-                        'match_id' => 'mock-test-1',
-                        'date' => now()->toDateString(),
-                        'status' => 'Match Finished',
-                        'home_team' => 'Testland',
-                        'away_team' => 'Mockovia',
-                        'home_score' => 5,
-                        'away_score' => 2,
+                        'id' => 9999,
+                        'utcDate' => now()->toDateString(),
+                        'status' => 'FINISHED',
+                        'stage' => 'FINAL',
+                        'homeTeam' => ['name' => 'Testland', 'tla' => 'TES'],
+                        'awayTeam' => ['name' => 'Mockovia', 'tla' => 'MOC'],
+                        'score' => [
+                            'fullTime' => ['home' => 5, 'away' => 2]
+                        ]
                     ]
                 ]
             ], 200)

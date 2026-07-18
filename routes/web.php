@@ -71,6 +71,14 @@ Route::prefix('admin')
             [TournamentController::class, 'storeRegisteredTeam'])
             ->name('tournaments.register-team.store');
 
+        // Group management routes on Tournament
+        Route::post('/tournaments/{tournament:tournament_id}/groups',
+            [TournamentController::class, 'addGroup'])
+            ->name('tournaments.groups.store');
+        Route::delete('/tournaments/{tournament:tournament_id}/groups/{group:group_id}',
+            [TournamentController::class, 'removeGroup'])
+            ->name('tournaments.groups.destroy');
+
         // Prompt 13: Teams (real CRUD)
         Route::resource('teams', TeamController::class)
             ->parameters(['teams' => 'team:team_id'])
